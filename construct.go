@@ -20,16 +20,16 @@ type AdapterConfig struct {
 func NewAdapter(config *AdapterConfig) Adapter {
 	switch config.AdapterType {
 	case OpenAI:
-		return openai.NewClient(config.ApiKey, config.EndPoint, config.ProxyURL)
+		return openai.NewClient(config.EndPoint, config.ApiKey, config.ProxyURL)
 	case Gemini:
-		return gemini.NewClient(config.ApiKey, config.EndPoint, config.ProxyURL)
+		return gemini.NewClient(config.EndPoint, config.ApiKey, config.ProxyURL)
 	case OAINoModels:
-		return oainomodels.NewClient(config.ApiKey, config.EndPoint, config.ProxyURL, config.ManualModels)
+		return oainomodels.NewClient(config.EndPoint, config.ApiKey, config.ProxyURL, config.ManualModels)
 	case SiliconFlow:
-		return siliconflow.NewClient(config.ApiKey, config.EndPoint, config.ProxyURL)
+		return siliconflow.NewClient(config.EndPoint, config.ApiKey, config.ProxyURL)
 	case SiliconFlowFree:
-		return siliconflow_free.NewClient(config.ApiKey, config.EndPoint, config.ProxyURL)
+		return siliconflow_free.NewClient(config.EndPoint, config.ApiKey, config.ProxyURL)
 	default:
-		return openai.NewClient(config.ApiKey, config.EndPoint, config.ProxyURL)
+		return openai.NewClient(config.EndPoint, config.ApiKey, config.ProxyURL)
 	}
 }
