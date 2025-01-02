@@ -33,17 +33,17 @@ func (p *Client) ChatCompletions(ctx context.Context, req *api.ChatRequest) (io.
 	if err != nil {
 		return nil, nil, err
 	}
-	url := p.EndPoint + "/api/chat/completions"
+	url := p.EndPoint + "/v1/chat/completions"
 	return p.DoJsonRequest(ctx, "POST", url, bytes.NewBuffer(bodyBytes))
 }
 
 func (p *Client) ChatCompletionsByBytes(ctx context.Context, req []byte) (io.ReadCloser, http.Header, error) {
-	url := p.EndPoint + "/api/chat/completions"
+	url := p.EndPoint + "/v1/chat/completions"
 	return p.DoJsonRequest(ctx, "POST", url, bytes.NewBuffer(req))
 }
 
 func (p *Client) Models(ctx context.Context) ([]string, error) {
-	url := p.EndPoint + "/api/models"
+	url := p.EndPoint + "/v1/models"
 	respBody, _, err := p.DoJsonRequest(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -69,12 +69,12 @@ func (p *Client) Completions(ctx context.Context, req *api.CompletionsRequest) (
 	if err != nil {
 		return nil, nil, err
 	}
-	url := p.EndPoint + "/api/completions"
+	url := p.EndPoint + "/v1/completions"
 	return p.DoJsonRequest(ctx, "POST", url, bytes.NewBuffer(bodyBytes))
 }
 
 func (p *Client) CompletionsByBytes(ctx context.Context, req []byte) (io.ReadCloser, http.Header, error) {
-	url := p.EndPoint + "/api/completions"
+	url := p.EndPoint + "/v1/completions"
 	return p.DoJsonRequest(ctx, "POST", url, bytes.NewBuffer(req))
 }
 
@@ -83,13 +83,13 @@ func (p *Client) Embeddings(ctx context.Context, req *api.EmbeddingRequest) (io.
 	if err != nil {
 		return nil, nil, err
 	}
-	url := p.EndPoint + "/api/embeddings"
+	url := p.EndPoint + "/v1/embeddings"
 	return p.DoJsonRequest(ctx, "POST", url, bytes.NewBuffer(bodyBytes))
 
 }
 
 func (p *Client) EmbeddingsByBytes(ctx context.Context, req []byte) (io.ReadCloser, http.Header, error) {
-	url := p.EndPoint + "/api/embeddings"
+	url := p.EndPoint + "/v1/embeddings"
 	return p.DoJsonRequest(ctx, "POST", url, bytes.NewBuffer(req))
 }
 
@@ -98,18 +98,18 @@ func (p *Client) CreateSpeech(ctx context.Context, req *api.SpeechRequest) (io.R
 	if err != nil {
 		return nil, nil, err
 	}
-	url := p.EndPoint + "/api/audio/speech"
+	url := p.EndPoint + "/v1/audio/speech"
 	return p.DoJsonRequest(ctx, "POST", url, bytes.NewBuffer(bodyBytes))
 }
 
 func (p *Client) CreateSpeechByBytes(ctx context.Context, req []byte) (io.ReadCloser, http.Header, error) {
-	url := p.EndPoint + "/api/audio/speech"
+	url := p.EndPoint + "/v1/audio/speech"
 	return p.DoJsonRequest(ctx, "POST", url, bytes.NewBuffer(req))
 	//return p.DoTextToSpeechRequest(ctx, bytes.NewBuffer(req))
 }
 
 func (p *Client) Transcriptions(ctx context.Context, req *api.TranscriptionRequest) (io.ReadCloser, http.Header, error) {
-	url := p.EndPoint + "/api/audio/transcriptions"
+	url := p.EndPoint + "/v1/audio/transcriptions"
 	// 创建一个字节缓冲区来存储请求体
 	var buf bytes.Buffer
 	// 创建 multipart 写入器
@@ -161,7 +161,7 @@ func (p *Client) Transcriptions(ctx context.Context, req *api.TranscriptionReque
 }
 
 func (p *Client) Translations(ctx context.Context, req *api.TranslationRequest) (io.ReadCloser, http.Header, error) {
-	url := p.EndPoint + "/api/audio/translations"
+	url := p.EndPoint + "/v1/audio/translations"
 	// 创建一个字节缓冲区来存储请求体
 	var buf bytes.Buffer
 	// 创建 multipart 写入器
@@ -213,7 +213,7 @@ func (p *Client) Translations(ctx context.Context, req *api.TranslationRequest) 
 }
 
 func (p *Client) CreateImage(ctx context.Context, req *api.CreateImageRequest) (io.ReadCloser, http.Header, error) {
-	url := p.EndPoint + "/api/images/generations"
+	url := p.EndPoint + "/v1/images/generations"
 	bodyBytes, err := sonic.Marshal(req)
 	if err != nil {
 		return nil, nil, err
@@ -222,12 +222,12 @@ func (p *Client) CreateImage(ctx context.Context, req *api.CreateImageRequest) (
 }
 
 func (p *Client) CreateImageByBytes(ctx context.Context, req []byte) (io.ReadCloser, http.Header, error) {
-	url := p.EndPoint + "/api/images/generations"
+	url := p.EndPoint + "/v1/images/generations"
 	return p.DoJsonRequest(ctx, "POST", url, bytes.NewBuffer(req))
 }
 
 func (p *Client) CreateImageEdit(ctx context.Context, req *api.EditImageRequest) (io.ReadCloser, http.Header, error) {
-	url := p.EndPoint + "/api/images/edits"
+	url := p.EndPoint + "/v1/images/edits"
 	// 创建一个字节缓冲区来存储请求体
 	var buf bytes.Buffer
 	// 创建 multipart 写入器
@@ -307,7 +307,7 @@ func (p *Client) CreateImageEdit(ctx context.Context, req *api.EditImageRequest)
 }
 
 func (p *Client) ImageVariations(ctx context.Context, req *api.CreateImageVariationRequest) (io.ReadCloser, http.Header, error) {
-	url := p.EndPoint + "/api/images/variations"
+	url := p.EndPoint + "/v1/images/variations"
 	// 创建一个字节缓冲区来存储请求体
 	var buf bytes.Buffer
 	// 创建 multipart 写入器
@@ -404,23 +404,3 @@ func (p *Client) DoFormRequest(ctx context.Context, url string, body io.Reader, 
 	// 创建 multipart 写入器
 	return p.DoRequest(ctx, url, "POST", body, contentType)
 }
-
-//func (p *Client) DoChatCompletionsRequest(ctx context.Context, input io.Reader) (io.ReadCloser, http.Header, error) {
-//	url := p.EndPoint + "/api/chat/completions"
-//	return p.DoJsonRequest(ctx, "POST", url, input)
-//}
-
-//func (p *Client) DoEmbeddingsRequest(ctx context.Context, input io.Reader) (io.ReadCloser, http.Header, error) {
-//	url := p.EndPoint + "/api/embeddings"
-//	return p.DoJsonRequest(ctx, "POST", url, input)
-//}
-
-//func (p *Client) DoCompletionsRequest(ctx context.Context, input io.Reader) (io.ReadCloser, http.Header, error) {
-//	url := p.EndPoint + "/api/completions"
-//	return p.DoJsonRequest(ctx, "POST", url, input)
-//}
-
-//func (p *Client) DoTextToSpeechRequest(ctx context.Context, input io.Reader) (io.ReadCloser, http.Header, error) {
-//	url := p.EndPoint + "/api/audio/speech"
-//	return p.DoJsonRequest(ctx, "POST", url, input)
-//}
