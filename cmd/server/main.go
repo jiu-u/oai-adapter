@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/jiu-u/oai-adapter/clients/gemini"
+	oaiadapter "github.com/jiu-u/oai-adapter"
 	"net/http"
 	"net/url"
 )
@@ -12,11 +12,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	geminiClient := gemini.NewClient("https://generativelanguage.googleapis.com",
-		"xxxxxxxxxxxxxxxxxxxxxx", proxyURL)
-
+	cl := oaiadapter.NewAdapter(&oaiadapter.AdapterConfig{
+		AdapterType:  oaiadapter.Gemini,
+		ApiKey:       "sahdjhasjhadaysdajdaghdagdjahdya",
+		EndPoint:     "https://generativelanguage.googleapis.com",
+		ManualModels: nil,
+		ProxyURL:     proxyURL,
+	})
 	mux := http.NewServeMux()
-	mux.HandleFunc("/v1/chat/completions", HandleChatCompletions(geminiClient))
+	mux.HandleFunc("/v1/chat/completions", HandleChatCompletions(cl))
+	mux.HandleFunc("/v1/models", HandleModels(cl))
 
 	handler := corsMiddleware(mux)
 
