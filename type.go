@@ -8,4 +8,6 @@ const (
 	OAINoModels     AdapterType = "oaiNoModels"
 	SiliconFlow     AdapterType = "siliconflow"
 	SiliconFlowFree AdapterType = "siliconflowFree"
+	OLLMA           AdapterType = "ollma"
+	DeepSeek        AdapterType = "deepseek"
 )

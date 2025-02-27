@@ -378,7 +378,7 @@ func (p *Client) DoRequest(ctx context.Context, url string, Method string, body 
 	}
 	request.Header.Set("Content-Type", contextType)
 	request.Header.Set("Authorization", "Bearer "+p.APIKey)
-	client := &http.Client{Timeout: 30 * time.Second}
+	client := &http.Client{Timeout: 5 * time.Minute}
 	if p.ProxyURL != nil {
 		client.Transport = &http.Transport{
 			Proxy: http.ProxyURL(p.ProxyURL),

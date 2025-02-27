@@ -1,0 +1,14 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api
+    hostname: api
+#    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - OAI_TYPE=openapi
+      - OAI_UTL=https://api.openai.com
+      - OAI_KEY=sk-example

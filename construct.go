@@ -1,6 +1,7 @@
 package oai_adapter
 
 import (
+	"github.com/jiu-u/oai-adapter/clients/deepseek"
 	"github.com/jiu-u/oai-adapter/clients/gemini"
 	oainomodels "github.com/jiu-u/oai-adapter/clients/oai_no_models"
 	"github.com/jiu-u/oai-adapter/clients/openai"
@@ -29,6 +30,8 @@ func NewAdapter(config *AdapterConfig) Adapter {
 		return siliconflow.NewClient(config.EndPoint, config.ApiKey, config.ProxyURL)
 	case SiliconFlowFree:
 		return siliconflow_free.NewClient(config.EndPoint, config.ApiKey, config.ProxyURL)
+	case DeepSeek:
+		return deepseek.NewClient(config.EndPoint, config.ApiKey, config.ProxyURL)
 	default:
 		return openai.NewClient(config.EndPoint, config.ApiKey, config.ProxyURL)
 	}
