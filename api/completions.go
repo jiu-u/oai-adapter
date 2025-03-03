@@ -19,6 +19,13 @@ type CompletionsRequest struct {
 	Suffix           string         `json:"suffix,omitempty"`
 	TopP             float64        `json:"top_p,omitempty"`
 	User             string         `json:"user,omitempty"`
+	// ollama specific
+	Images    []string `json:"images,omitempty"`
+	Format    any      `json:"format,omitempty"`
+	System    string   `json:"system,omitempty"`
+	Template  string   `json:"template,omitempty"`
+	Raw       bool     `json:"raw,omitempty"`
+	KeepAlive string   `json:"keep_alive,omitempty"`
 }
 
 type (

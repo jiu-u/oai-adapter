@@ -15,29 +15,26 @@ func GetClient() (oaiadapter.Adapter, error) {
 	clientType := os.Getenv("OAI_TYPE")
 	clientURL := os.Getenv("OAI_URL")
 	clientKey := os.Getenv("OAI_KEY")
-	if proxyENV == "" {
-		client := oaiadapter.NewAdapter(&oaiadapter.AdapterConfig{
-			AdapterType:  oaiadapter.AdapterType(clientType),
-			ApiKey:       clientKey,
-			EndPoint:     clientURL,
-			ManualModels: nil,
-			ProxyURL:     nil,
-		})
-		return client, nil
-	} else {
+
+	// 公共配置
+	config := &oaiadapter.AdapterConfig{
+		AdapterType:  oaiadapter.AdapterType(clientType),
+		ApiKey:       clientKey,
+		EndPoint:     clientURL,
+		ManualModels: nil,
+		ProxyURL:     nil,
+	}
+
+	if proxyENV != "" {
 		proxyURL, err := url.Parse(proxyENV)
 		if err != nil {
 			return nil, err
 		}
-		client := oaiadapter.NewAdapter(&oaiadapter.AdapterConfig{
-			AdapterType:  oaiadapter.AdapterType(clientType),
-			ApiKey:       clientKey,
-			EndPoint:     clientURL,
-			ManualModels: nil,
-			ProxyURL:     proxyURL,
-		})
-		return client, nil
+		config.ProxyURL = proxyURL
 	}
+
+	client := oaiadapter.NewAdapter(config)
+	return client, nil
 }
 
 func main() {

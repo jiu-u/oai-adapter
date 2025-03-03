@@ -1,6 +1,6 @@
 FROM golang:1.23.3-alpine AS builder
 
-ARG APP_RELATIVE_PATH=./cmd/server/main.go
+ARG APP_RELATIVE_PATH=./cmd/server/
 
 RUN set -eux && sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 

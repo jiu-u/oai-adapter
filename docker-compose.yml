@@ -10,5 +10,5 @@ services:
       - "8080:8080"
     environment:
       - OAI_TYPE=openapi
-      - OAI_UTL=https://api.openai.com
+      - OAI_URL=https://api.openai.com
       - OAI_KEY=sk-example
