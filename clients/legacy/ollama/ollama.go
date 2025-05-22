@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/bytedance/sonic"
 	"github.com/jiu-u/oai-adapter/api"
-	"github.com/jiu-u/oai-adapter/clients/openai"
+	"github.com/jiu-u/oai-adapter/clients/legacy/openai"
 	"github.com/jiu-u/oai-adapter/pkg/rr"
 	"io"
 	"log"

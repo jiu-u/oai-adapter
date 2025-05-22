@@ -1,6 +1,9 @@
 package constant
 
-const DeepSeekDefaultURL = "https://api.deepseek.com"
-const DeepSeekDefaultModel = "deepseek-chat"
-
-const XAIDefaultURL = "https://api.x.ai"
+const (
+	DeepSeekDefaultURL    = "https://api.deepseek.com"
+	OpenAIDefaultURL      = "https://api.openai.com"
+	SiliconFlowDefaultURL = "https://api.siliconflow.ai"
+	XAIDefaultURL         = "https://api.x.ai"
+	GeminiDefaultURL      = "https://generativelanguage.googleapis.com"
+)

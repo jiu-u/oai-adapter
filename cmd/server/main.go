@@ -24,6 +24,7 @@ func GetClient() (oaiadapter.Adapter, error) {
 		ManualModels: nil,
 		ProxyURL:     nil,
 	}
+	fmt.Println(config)
 
 	if proxyENV != "" {
 		proxyURL, err := url.Parse(proxyENV)
@@ -38,7 +39,7 @@ func GetClient() (oaiadapter.Adapter, error) {
 }
 
 func main() {
-	devMode := flag.Bool("dev", false, "dev mode")
+	devMode := flag.Bool("dev", true, "dev mode")
 	flag.Parse()
 	if *devMode {
 		// 加载.env文件

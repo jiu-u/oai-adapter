@@ -3,7 +3,7 @@ package gemini
 import (
 	"context"
 	"github.com/jiu-u/oai-adapter/api"
-	"github.com/jiu-u/oai-adapter/clients/openai"
+	"github.com/jiu-u/oai-adapter/clients/legacy/openai"
 	"io"
 	"net/http"
 )

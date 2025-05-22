@@ -3,7 +3,7 @@ package gemini
 import (
 	"context"
 	"fmt"
-	"github.com/jiu-u/oai-adapter/clients/gemini"
+	"github.com/jiu-u/oai-adapter/clients/legacy/gemini"
 	"net/url"
 	"os"
 	"testing"

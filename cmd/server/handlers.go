@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"github.com/jiu-u/oai-adapter/api"
 	"io"
 	"net/http"
+	"time"
 )
 
 type RelayAction int
@@ -31,12 +33,28 @@ const (
 
 func RelayHandler(cl oaiadapter.Adapter, action RelayAction) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		startTime := time.Now()
+		//	读取数据
+		if r.Method == http.MethodPost {
+			data, err := io.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			fmt.Println(string(data))
+			r.Body = io.NopCloser(bytes.NewBuffer(data))
+		}
+		fmt.Printf("函数执行耗时1: %s\n", time.Since(startTime))
 		requestBody, err := ParseRequest(r, action)
+		fmt.Printf("函数执行耗时2: %s\n", time.Since(startTime))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		respBody, respHeader, err := DoRelayRequest(r.Context(), cl, action, requestBody)
+
+		elapsed := time.Since(startTime)
+		fmt.Printf("函数执行耗时: %s\n", elapsed)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

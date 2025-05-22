@@ -12,4 +12,4 @@ docker:
 	docker run --rm -it -p 8080:8080 zywoo/adapter-demo:v1
 
 #docker buildx build --platform linux/arm64 -t zywoo/adapter-demo-arm64:v1 .
-# docker save zywoo/adapter-demo-arm64:v1 -o dist2.tar
+# docker save zywoo/adapter-demo-arm64:v1 -o dist.tar

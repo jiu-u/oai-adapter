@@ -1,80 +1,81 @@
 package deepseek
 
 import (
-	"bytes"
 	"context"
-	"github.com/bytedance/sonic"
-	"github.com/jiu-u/oai-adapter/api"
-	"github.com/jiu-u/oai-adapter/clients/openai"
+	v1 "github.com/jiu-u/oai-adapter/api/v1"
+	base2 "github.com/jiu-u/oai-adapter/clients/base"
 	"github.com/jiu-u/oai-adapter/constant"
 	"io"
 	"net/http"
-	stdurl "net/url"
+	"strings"
 )
 
 type Client struct {
-	*openai.Client
+	*base2.Client
 }
 
-func NewClient(endpoint, apiKey string, proxy *stdurl.URL) *Client {
-	if len(endpoint) == 0 {
-		endpoint = constant.DeepSeekDefaultURL
+func NewClient(endPoint, apiKey string) *Client {
+	if endPoint == "" {
+		endPoint = constant.DeepSeekDefaultURL
 	}
+	endPoint = strings.TrimSpace(endPoint)
+	endPoint = strings.TrimRight(endPoint, "/")
+	client := base2.NewClient(endPoint, apiKey)
 	return &Client{
-		Client: openai.NewClient(endpoint, apiKey, proxy),
+		Client: client,
 	}
 }
 
-func (c *Client) Completions(ctx context.Context, req *api.CompletionsRequest) (io.ReadCloser, http.Header, error) {
-	bodyBytes, err := sonic.Marshal(req)
-	if err != nil {
-		return nil, nil, err
-	}
-	url := c.EndPoint + "/beta/completions"
-	return c.DoJsonRequest(ctx, "POST", url, bytes.NewBuffer(bodyBytes))
+func (c *Client) CreateChatCompletions(ctx context.Context, req *v1.ChatCompletionRequest) (io.ReadCloser, http.Header, error) {
+	targetUrl := c.EndPoint + "/v1/chat/completions"
+	return c.SamePostJob(ctx, targetUrl, req, "application/json")
 }
 
-func (c *Client) CompletionsByBytes(ctx context.Context, req []byte) (io.ReadCloser, http.Header, error) {
-	url := c.EndPoint + "/beta/completions"
-	return c.DoJsonRequest(ctx, "POST", url, bytes.NewBuffer(req))
+func (c *Client) CreateCompletions(ctx context.Context, req *v1.CompletionsRequest) (io.ReadCloser, http.Header, error) {
+	targetUrl := c.EndPoint + "/beta/completions"
+	return c.SamePostJob(ctx, targetUrl, req, "application/json")
 }
 
-func (c *Client) Embeddings(ctx context.Context, req *api.EmbeddingRequest) (io.ReadCloser, http.Header, error) {
-	return openai.NoImplementMethod()
+func (c *Client) CreateResponses(ctx context.Context, req *v1.ResponsesRequest) (io.ReadCloser, http.Header, error) {
+	return base2.NoImplementMethod()
 }
 
-func (c *Client) EmbeddingsByBytes(ctx context.Context, req []byte) (io.ReadCloser, http.Header, error) {
-	return openai.NoImplementMethod()
+func (c *Client) CreateEmbeddings(ctx context.Context, req *v1.EmbeddingsRequest) (io.ReadCloser, http.Header, error) {
+	return base2.NoImplementMethod()
 }
 
-func (c *Client) CreateSpeech(ctx context.Context, req *api.SpeechRequest) (io.ReadCloser, http.Header, error) {
-	return openai.NoImplementMethod()
+func (c *Client) CreateRerank(ctx context.Context, req *v1.RerankRequest) (io.ReadCloser, http.Header, error) {
+	return base2.NoImplementMethod()
 }
 
-func (c *Client) CreateSpeechByBytes(ctx context.Context, req []byte) (io.ReadCloser, http.Header, error) {
-	return openai.NoImplementMethod()
+func (c *Client) CreateImage(ctx context.Context, req *v1.ImageGenerateRequest) (io.ReadCloser, http.Header, error) {
+	return base2.NoImplementMethod()
 }
 
-func (c *Client) Transcriptions(ctx context.Context, req *api.TranscriptionRequest) (io.ReadCloser, http.Header, error) {
-	return openai.NoImplementMethod()
+func (c *Client) CreateImageEdit(ctx context.Context, req *v1.ImageEditRequest) (io.ReadCloser, http.Header, error) {
+	return base2.NoImplementMethod()
 }
 
-func (c *Client) Translations(ctx context.Context, req *api.TranslationRequest) (io.ReadCloser, http.Header, error) {
-	return openai.NoImplementMethod()
+func (c *Client) CreateImageVariation(ctx context.Context, req *v1.ImageVariationRequest) (io.ReadCloser, http.Header, error) {
+	return base2.NoImplementMethod()
 }
 
-func (c *Client) CreateImage(ctx context.Context, req *api.CreateImageRequest) (io.ReadCloser, http.Header, error) {
-	return openai.NoImplementMethod()
+func (c *Client) CreateSpeech(ctx context.Context, req *v1.AudioSpeechRequest) (io.ReadCloser, http.Header, error) {
+	return base2.NoImplementMethod()
 }
 
-func (c *Client) CreateImageByBytes(ctx context.Context, req []byte) (io.ReadCloser, http.Header, error) {
-	return openai.NoImplementMethod()
+func (c *Client) CreateTranslation(ctx context.Context, req *v1.TranslationRequest) (io.ReadCloser, http.Header, error) {
+	return base2.NoImplementMethod()
 }
 
-func (c *Client) CreateImageEdit(ctx context.Context, req *api.EditImageRequest) (io.ReadCloser, http.Header, error) {
-	return openai.NoImplementMethod()
+func (c *Client) CreateTranscription(ctx context.Context, req *v1.TranscriptionRequest) (io.ReadCloser, http.Header, error) {
+	return base2.NoImplementMethod()
 }
 
-func (c *Client) ImageVariations(ctx context.Context, req *api.CreateImageVariationRequest) (io.ReadCloser, http.Header, error) {
-	return openai.NoImplementMethod()
+func (c *Client) CreateVideoSubmit(ctx context.Context, req *v1.VideoRequest) (*v1.VideoResponse, error) {
+	return nil, v1.NoImplementError
+}
+
+func (c *Client) GetVideoStatus(ctx context.Context, externalID string) (bool, any, error) {
+	return false, nil, v1.NoImplementError
 }

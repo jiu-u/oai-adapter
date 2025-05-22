@@ -1,34 +1,41 @@
-package openai
+package gemini_oai
 
 import (
 	"context"
 	v1 "github.com/jiu-u/oai-adapter/api/v1"
-	base2 "github.com/jiu-u/oai-adapter/clients/base"
+	"github.com/jiu-u/oai-adapter/clients/base"
 	"github.com/jiu-u/oai-adapter/constant"
-	"io"
-	"net/http"
 	"strings"
 )
 
+var GeminiVersion = "v1beta"
+
 type Client struct {
-	*base2.Client
+	*base.Client
 }
 
 func NewClient(endPoint, apiKey string) *Client {
 	if endPoint == "" {
-		endPoint = constant.OpenAIDefaultURL
+		endPoint = constant.GeminiDefaultURL
 	}
 	endPoint = strings.TrimSpace(endPoint)
 	endPoint = strings.TrimRight(endPoint, "/")
-	endPoint = endPoint + "/v1"
-	client := base2.NewClient(endPoint, apiKey)
+	endPoint = endPoint + "/" + GeminiVersion + "/openai"
 	return &Client{
-		Client: client,
+		Client: base.NewClient(endPoint, apiKey),
 	}
 }
 
-func (c *Client) CreateRerank(ctx context.Context, req *v1.RerankRequest) (io.ReadCloser, http.Header, error) {
-	return base2.NoImplementMethod()
+func NewClientWithVersion(endPoint, apiKey, version string) *Client {
+	if endPoint == "" {
+		endPoint = constant.GeminiDefaultURL
+	}
+	endPoint = strings.TrimSpace(endPoint)
+	endPoint = strings.TrimRight(endPoint, "/")
+	endPoint = endPoint + "/" + version + "/openai"
+	return &Client{
+		Client: base.NewClient(endPoint, apiKey),
+	}
 }
 
 func (c *Client) CreateVideoSubmit(ctx context.Context, req *v1.VideoRequest) (*v1.VideoResponse, error) {

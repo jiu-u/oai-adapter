@@ -1,19 +1,18 @@
 package api
 
 type EmbeddingRequest struct {
-	Model          string `json:"model"`
 	Input          any    `json:"input"`
+	Model          string `json:"model"`
 	User           string `json:"user,omitempty"`
 	EncodingFormat string `json:"encoding_format,omitempty"`
 	Dimensions     int    `json:"dimensions,omitempty"`
 }
 
 type EmbeddingResponse struct {
-	Object    string `json:"object"`
-	Data      []Data `json:"data"`
-	Model     string `json:"model"`
-	Usage     Usage  `json:"usage"`
-	Embedding []any  `json:"embedding,omitempty"`
+	Object string `json:"object"`
+	Model  string `json:"model"`
+	Data   []Data `json:"data"`
+	Usage  Usage  `json:"usage"`
 }
 
 type Data struct {

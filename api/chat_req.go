@@ -7,8 +7,8 @@ import (
 
 type (
 	ChatRequest struct {
-		Messages            []Message       `json:"messages"` // 聊天消息
-		Model               string          `json:"model"`    // 模型名称
+		Messages            []Message       `json:"messages"`                 // 聊天消息
+		Model               string          `json:"model" binding:"required"` // 模型名称
 		Store               bool            `json:"store,omitempty"`
 		ReasoningEffect     string          `json:"reasoning_effect,omitempty"`
 		MetaData            any             `json:"meta_data,omitempty"`
@@ -119,7 +119,7 @@ func (m *Message) ParseContent() ([]MediaContent, error) {
 		})
 		return contentList, nil
 	}
-	
+
 	if err := json.Unmarshal(m.Content, &contentList); err == nil {
 		return contentList, nil
 	} else {

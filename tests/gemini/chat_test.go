@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/jiu-u/oai-adapter/api"
-	"github.com/jiu-u/oai-adapter/clients/gemini"
+	"github.com/jiu-u/oai-adapter/clients/legacy/gemini"
 	"io"
 	"testing"
 )

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 )
 
 func getContentType(header http.Header) string {
@@ -15,13 +16,13 @@ func getContentType(header http.Header) string {
 
 func HandleOAIResponse(w http.ResponseWriter, req *http.Request, responseBody io.ReadCloser, respHeader http.Header) {
 	defer responseBody.Close()
-
+	multiWriter := io.MultiWriter(w, os.Stdout)
 	// 设置响应头
 	for k, v := range respHeader {
 		w.Header().Set(k, v[0])
 	}
-	
-	_, err := io.Copy(w, responseBody)
+
+	_, err := io.Copy(multiWriter, responseBody)
 	if err != nil {
 		fmt.Println("error writing response:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
