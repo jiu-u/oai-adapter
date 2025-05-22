@@ -6,7 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	oaiadapter "github.com/jiu-u/oai-adapter"
-	"github.com/jiu-u/oai-adapter/api"
+	v1 "github.com/jiu-u/oai-adapter/api/v1"
+	"github.com/jiu-u/oai-adapter/common"
 	"io"
 	"net/http"
 	"time"
@@ -15,20 +16,20 @@ import (
 type RelayAction int
 
 const (
-	ChatCompletions RelayAction = iota
-	ChatCompletionsByBytes
+	RelayRequest RelayAction = iota
+	Responses    RelayAction = iota
+	ChatCompletions
 	Completions
-	CompletionsByBytes
 	Embeddings
-	EmbeddingsByBytes
+	Rerank
 	CreateSpeech
-	CreateSpeechByBytes
 	Transcriptions
 	Translations
 	CreateImage
-	CreateImageByBytes
 	CreateImageEdit
 	ImageVariations
+	VideoSubmit
+	VideoStatus
 )
 
 func RelayHandler(cl oaiadapter.Adapter, action RelayAction) func(w http.ResponseWriter, r *http.Request) {
@@ -65,66 +66,78 @@ func RelayHandler(cl oaiadapter.Adapter, action RelayAction) func(w http.Respons
 
 func ParseRequest(r *http.Request, action RelayAction) (any, error) {
 	switch action {
+	case Responses:
+		var req v1.ResponsesRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			return nil, err
+		}
+		return &req, nil
 	case ChatCompletions:
-		var req api.ChatRequest
+		var req v1.ChatCompletionRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			return nil, err
 		}
 		return &req, nil
 	case Completions:
-		var req api.CompletionsRequest
+		var req v1.CompletionsRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			return nil, err
 		}
 		return &req, nil
 	case Embeddings:
-		var req api.EmbeddingRequest
+		var req v1.EmbeddingsRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			return nil, err
+		}
+		return &req, nil
+	case Rerank:
+		var req v1.RerankRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			return nil, err
 		}
 		return &req, nil
 	case CreateSpeech:
-		var req api.SpeechRequest
+		var req v1.AudioSpeechRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			return nil, err
 		}
 		return &req, nil
 	case Transcriptions:
-		var req api.TranscriptionRequest
+		var req v1.TranscriptionRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			return nil, err
 		}
 		return &req, nil
 	case Translations:
-		var req api.TranslationRequest
+		var req v1.TranslationRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			return nil, err
 		}
 		return &req, nil
 	case CreateImage:
-		var req api.CreateImageRequest
+		var req v1.ImageGenerateRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			return nil, err
 		}
 		return &req, nil
 	case CreateImageEdit:
-		var req api.EditImageRequest
+		var req v1.ImageEditRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			return nil, err
 		}
 		return &req, nil
 	case ImageVariations:
-		var req api.CreateImageVariationRequest
+		var req v1.ImageVariationRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			return nil, err
 		}
 		return &req, nil
-	case ChatCompletionsByBytes, CompletionsByBytes, EmbeddingsByBytes, CreateSpeechByBytes, CreateImageByBytes:
-		bodyBytes, err := io.ReadAll(r.Body)
-		if err != nil {
+	case VideoSubmit:
+		var req v1.VideoRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			return nil, err
 		}
-		return bodyBytes, nil
+		return &req, nil
 	default:
 		return nil, fmt.Errorf("unsupported action")
 	}
@@ -132,140 +145,99 @@ func ParseRequest(r *http.Request, action RelayAction) (any, error) {
 
 func DoRelayRequest(ctx context.Context, cl oaiadapter.Adapter, action RelayAction, requestBody any) (io.ReadCloser, http.Header, error) {
 	switch action {
+	case Responses:
+		req := requestBody.(*v1.ResponsesRequest)
+		return cl.CreateResponses(ctx, req)
 	case ChatCompletions:
-		req := requestBody.(*api.ChatRequest)
-		return cl.ChatCompletions(ctx, req)
-	case ChatCompletionsByBytes:
-		req := requestBody.([]byte)
-		return cl.ChatCompletionsByBytes(ctx, req)
+		req := requestBody.(*v1.ChatCompletionRequest)
+		return cl.CreateChatCompletions(ctx, req)
 	case Completions:
-		req := requestBody.(*api.CompletionsRequest)
-		return cl.Completions(ctx, req)
-	case CompletionsByBytes:
-		req := requestBody.([]byte)
-		return cl.CompletionsByBytes(ctx, req)
+		req := requestBody.(*v1.CompletionsRequest)
+		return cl.CreateCompletions(ctx, req)
 	case Embeddings:
-		req := requestBody.(*api.EmbeddingRequest)
-		return cl.Embeddings(ctx, req)
-	case EmbeddingsByBytes:
-		req := requestBody.([]byte)
-		return cl.EmbeddingsByBytes(ctx, req)
+		req := requestBody.(*v1.EmbeddingsRequest)
+		return cl.CreateEmbeddings(ctx, req)
+	case Rerank:
+		req := requestBody.(*v1.RerankRequest)
+		return cl.CreateRerank(ctx, req)
 	case CreateSpeech:
-		req := requestBody.(*api.SpeechRequest)
+		req := requestBody.(*v1.AudioSpeechRequest)
 		return cl.CreateSpeech(ctx, req)
-	case CreateSpeechByBytes:
-		req := requestBody.([]byte)
-		return cl.CreateSpeechByBytes(ctx, req)
 	case Transcriptions:
-		req := requestBody.(*api.TranscriptionRequest)
-		return cl.Transcriptions(ctx, req)
+		req := requestBody.(*v1.TranscriptionRequest)
+		return cl.CreateTranscription(ctx, req)
 	case Translations:
-		req := requestBody.(*api.TranslationRequest)
-		return cl.Translations(ctx, req)
+		req := requestBody.(*v1.TranslationRequest)
+		return cl.CreateTranslation(ctx, req)
 	case CreateImage:
-		req := requestBody.(*api.CreateImageRequest)
+		req := requestBody.(*v1.ImageGenerateRequest)
 		return cl.CreateImage(ctx, req)
-	case CreateImageByBytes:
-		req := requestBody.([]byte)
-		return cl.CreateImageByBytes(ctx, req)
 	case CreateImageEdit:
-		req := requestBody.(*api.EditImageRequest)
+		req := requestBody.(*v1.ImageEditRequest)
 		return cl.CreateImageEdit(ctx, req)
 	case ImageVariations:
-		req := requestBody.(*api.CreateImageVariationRequest)
-		return cl.ImageVariations(ctx, req)
+		req := requestBody.(*v1.ImageVariationRequest)
+		return cl.CreateImageVariation(ctx, req)
+	case VideoSubmit:
+		req := requestBody.(*v1.VideoRequest)
+		data, err := cl.CreateVideoSubmit(ctx, req)
+		if err != nil {
+			return nil, nil, err
+		}
+		dataBytes, err := json.Marshal(data)
+		if err != nil {
+			return nil, nil, err
+		}
+		header := http.Header{}
+		header.Set("Content-Type", "application/json")
+		header.Set("Cache-Control", "no-cache")
+		return io.NopCloser(bytes.NewBuffer(dataBytes)), header, nil
 	default:
 		return nil, nil, fmt.Errorf("unsupported action")
 	}
 }
 
-func HandleChatCompletions(cl oaiadapter.Adapter) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req api.ChatRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		//req.Model = "gemini-1.5-flash"
-		resp, header, err := cl.ChatCompletions(r.Context(), &req)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		HandleOAIResponse(w, r, resp, header)
-	}
-}
-
-type ModelItem struct {
-	ID      string `json:"id"`
-	Object  string `json:"object"`
-	Created int64  `json:"created,omitempty"`
-	OwnedBy string `json:"owned_by,omitempty"`
-}
-
-type ModelResponse struct {
-	Object string      `json:"object"`
-	Data   []ModelItem `json:"data"`
-}
-
 func HandleModels(cl oaiadapter.Adapter) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("HandleModels")
-		list, err := cl.Models(r.Context())
+		data, err := cl.Models(r.Context())
 		if err != nil {
 			fmt.Println(err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		models := make([]ModelItem, len(list))
-		fmt.Println(list)
-		for i, model := range list {
-			models[i] = ModelItem{
-				ID:      model,
-				Object:  "model",
-				Created: 0,
-				OwnedBy: "",
-			}
-		}
-		resp := ModelResponse{
-			Object: "list",
-			Data:   models,
-		}
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(resp); err != nil {
+		if err := json.NewEncoder(w).Encode(data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
 }
 
-func HandleCompletions(cl oaiadapter.Adapter) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req api.CompletionsRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		resp, header, err := cl.Completions(r.Context(), &req)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		HandleOAIResponse(w, r, resp, header)
+func HandleVideoStatus(w http.ResponseWriter, r *http.Request) {
+	var query v1.VideoStatusRequest
+	if err := json.NewDecoder(r.Body).Decode(&query); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
-}
-
-func HandleEmbeddings(cl oaiadapter.Adapter) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req api.EmbeddingRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		resp, header, err := cl.Embeddings(r.Context(), &req)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		HandleOAIResponse(w, r, resp, header)
+	if query.RequestId == "" {
+		http.Error(w, "requestId is empty", http.StatusBadRequest)
+		return
 	}
+	taskManager := common.GetDefaultTaskManager()
+	if taskManager == nil {
+		http.Error(w, "taskManager is nil", http.StatusInternalServerError)
+		return
+	}
+	res, exist := taskManager.GetTaskResult(query.RequestId)
+	if !exist {
+		http.Error(w, "task not exist", http.StatusBadRequest)
+		return
+	}
+	resData := res.Data.(*v1.VideoStatusResponse)
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(resData); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
