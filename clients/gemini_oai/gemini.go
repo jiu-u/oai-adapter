@@ -39,9 +39,11 @@ func NewClientWithVersion(endPoint, apiKey, version string) *Client {
 }
 
 func (c *Client) CreateVideoSubmit(ctx context.Context, req *v1.VideoRequest) (*v1.VideoResponse, error) {
-	return nil, v1.NoImplementError
+	_, _, err := base.NoImplementMethod(ctx, req)
+	return nil, err
 }
 
 func (c *Client) GetVideoStatus(ctx context.Context, externalID string) (bool, any, error) {
-	return false, nil, v1.NoImplementError
+	_, _, err := base.NoImplementMethod(ctx, externalID)
+	return false, nil, err
 }

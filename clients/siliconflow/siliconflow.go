@@ -28,21 +28,21 @@ func NewClient(endPoint, apiKey string) *Client {
 }
 
 func (c *Client) CreateCompletions(ctx context.Context, req *v1.CompletionsRequest) (io.ReadCloser, http.Header, error) {
-	return base2.NoImplementMethod()
+	return base2.NoImplementMethod(ctx, req)
 }
 
 func (c *Client) CreateResponses(ctx context.Context, req *v1.ResponsesRequest) (io.ReadCloser, http.Header, error) {
-	return base2.NoImplementMethod()
+	return base2.NoImplementMethod(ctx, req)
 }
 
 func (c *Client) CreateImageEdit(ctx context.Context, req *v1.ImageEditRequest) (io.ReadCloser, http.Header, error) {
-	return base2.NoImplementMethod()
+	return base2.NoImplementMethod(ctx, req)
 }
 
 func (c *Client) CreateImageVariation(ctx context.Context, req *v1.ImageVariationRequest) (io.ReadCloser, http.Header, error) {
-	return base2.NoImplementMethod()
+	return base2.NoImplementMethod(ctx, req)
 }
 
 func (c *Client) CreateTranslation(ctx context.Context, req *v1.TranslationRequest) (io.ReadCloser, http.Header, error) {
-	return base2.NoImplementMethod()
+	return base2.NoImplementMethod(ctx, req)
 }

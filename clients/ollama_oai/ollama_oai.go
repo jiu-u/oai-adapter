@@ -23,37 +23,39 @@ func NewClient(endPoint, apiKey string) *Client {
 }
 
 func (c *Client) CreateRerank(ctx context.Context, req *v1.RerankRequest) (io.ReadCloser, http.Header, error) {
-	return base.NoImplementMethod()
+	return base.NoImplementMethod(ctx, req)
 }
 
 func (c *Client) CreateSpeech(ctx context.Context, req *v1.AudioSpeechRequest) (io.ReadCloser, http.Header, error) {
-	return base.NoImplementMethod()
+	return base.NoImplementMethod(ctx, req)
 }
 
 func (c *Client) CreateTranslation(ctx context.Context, req *v1.TranslationRequest) (io.ReadCloser, http.Header, error) {
-	return base.NoImplementMethod()
+	return base.NoImplementMethod(ctx, req)
 }
 
 func (c *Client) CreateTranscription(ctx context.Context, req *v1.TranscriptionRequest) (io.ReadCloser, http.Header, error) {
-	return base.NoImplementMethod()
+	return base.NoImplementMethod(ctx, req)
 }
 
 func (c *Client) CreateImage(ctx context.Context, req *v1.ImageGenerateRequest) (io.ReadCloser, http.Header, error) {
-	return base.NoImplementMethod()
+	return base.NoImplementMethod(ctx, req)
 }
 
 func (c *Client) CreateImageEdit(ctx context.Context, req *v1.ImageEditRequest) (io.ReadCloser, http.Header, error) {
-	return base.NoImplementMethod()
+	return base.NoImplementMethod(ctx, req)
 }
 
 func (c *Client) CreateImageVariation(ctx context.Context, req *v1.ImageVariationRequest) (io.ReadCloser, http.Header, error) {
-	return base.NoImplementMethod()
+	return base.NoImplementMethod(ctx, req)
 }
 
 func (c *Client) CreateVideoSubmit(ctx context.Context, req *v1.VideoRequest) (*v1.VideoResponse, error) {
-	return nil, v1.NoImplementError
+	_, _, err := base.NoImplementMethod(ctx, req)
+	return nil, err
 }
 
 func (c *Client) GetVideoStatus(ctx context.Context, externalID string) (bool, any, error) {
-	return false, nil, v1.NoImplementError
+	_, _, err := base.NoImplementMethod(ctx, externalID)
+	return false, nil, err
 }

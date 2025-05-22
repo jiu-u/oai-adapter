@@ -7,6 +7,7 @@ import (
 	"github.com/jiu-u/oai-adapter/clients/ollama_oai"
 	"github.com/jiu-u/oai-adapter/clients/openai"
 	"github.com/jiu-u/oai-adapter/clients/siliconflow"
+	"github.com/jiu-u/oai-adapter/clients/xai"
 )
 
 type AdapterConfig struct {
@@ -49,7 +50,7 @@ func NewAdapter(config *AdapterConfig) Adapter {
 	//case OllamaNative:
 	//	return ollama_native.NewClient(config.EndPoint, config.ApiKey)
 	case XAI:
-		return base.NewClient(config.EndPoint, config.ApiKey)
+		return xai.NewClient(config.EndPoint, config.ApiKey)
 	default:
 		return base.NewClient(config.EndPoint, config.ApiKey)
 	}
