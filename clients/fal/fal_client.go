@@ -341,7 +341,8 @@ func (c *Client) CreateImage(ctx context.Context, req *v1.ImageGenerateRequest) 
 
 	reqBody := bytes.NewBuffer(reqBytes)
 	// 发送请求
-	createPath := "/fal-ai/" + strings.TrimSpace(req.Model)
+	//createPath := "/fal-ai/" + strings.TrimSpace(req.Model)
+	createPath := "/" + strings.TrimSpace(req.Model)
 
 	header := http.Header{}
 	header.Add("Content-Type", "application/json")
@@ -545,8 +546,8 @@ func (c *Client) CreateSpeech(ctx context.Context, req *v1.AudioSpeechRequest) (
 
 	reqBody := bytes.NewBuffer(reqBytes)
 	// 发送请求
-	createPath := "/fal-ai/" + strings.TrimSpace(req.Model)
-
+	//createPath := "/fal-ai/" + strings.TrimSpace(req.Model)
+	createPath := "/" + strings.TrimSpace(req.Model)
 	header := http.Header{}
 	header.Add("Content-Type", "application/json")
 	c.SetHeader(header)
@@ -603,7 +604,8 @@ func (c *Client) CreateVideoSubmit(ctx context.Context, req *v1.VideoRequest) (*
 
 	reqBody := bytes.NewBuffer(reqBytes)
 	// 发送请求
-	createPath := "/fal-ai/" + strings.TrimSpace(req.Model)
+	//createPath := "/fal-ai/" + strings.TrimSpace(req.Model)
+	createPath := "/" + strings.TrimSpace(req.Model)
 
 	header := http.Header{}
 	header.Add("Content-Type", "application/json")
@@ -638,7 +640,8 @@ func (c *Client) GetVideoStatus(ctx context.Context, externalID string) (bool, a
 	var videoResp v1.VideoStatusResponse
 	videoResp.Status = "InQueue"
 	model := ctx.Value("model").(string)
-	startPath := "/fal-ai/" + strings.TrimSpace(model) + "/requests"
+	//startPath := "/fal-ai/" + strings.TrimSpace(model) + "/requests"
+	startPath := "/" + strings.TrimSpace(model) + "/requests"
 
 	header := http.Header{}
 	header.Add("Content-Type", "application/json")
