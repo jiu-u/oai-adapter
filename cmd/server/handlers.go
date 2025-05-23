@@ -42,7 +42,7 @@ func RelayHandler(cl oaiadapter.Adapter, action RelayAction) func(w http.Respons
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
-			fmt.Println(string(data))
+			//fmt.Println(string(data))
 			r.Body = io.NopCloser(bytes.NewBuffer(data))
 		}
 		fmt.Printf("函数执行耗时1: %s\n", time.Since(startTime))
@@ -199,7 +199,6 @@ func DoRelayRequest(ctx context.Context, cl oaiadapter.Adapter, action RelayActi
 
 func HandleModels(cl oaiadapter.Adapter) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("HandleModels")
 		data, err := cl.Models(r.Context())
 		if err != nil {
 			fmt.Println(err)
@@ -239,5 +238,4 @@ func HandleVideoStatus(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 }

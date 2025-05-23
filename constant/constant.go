@@ -6,4 +6,5 @@ const (
 	SiliconFlowDefaultURL = "https://api.siliconflow.ai"
 	XAIDefaultURL         = "https://api.x.ai"
 	GeminiDefaultURL      = "https://generativelanguage.googleapis.com"
+	FalDefaultURL         = "https://queue.fal.run"
 )

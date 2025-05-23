@@ -3,6 +3,7 @@ package oai_adapter
 import (
 	"github.com/jiu-u/oai-adapter/clients/base"
 	"github.com/jiu-u/oai-adapter/clients/deepseek"
+	"github.com/jiu-u/oai-adapter/clients/fal"
 	"github.com/jiu-u/oai-adapter/clients/gemini_oai"
 	"github.com/jiu-u/oai-adapter/clients/ollama_oai"
 	"github.com/jiu-u/oai-adapter/clients/openai"
@@ -31,6 +32,8 @@ const (
 	Ollama     AdapterType = "Ollama"
 	Ollama2OAI AdapterType = "Ollama2OAI"
 	//OllamaNative AdapterType = "OllamaNative"
+
+	Fal AdapterType = "Fal"
 )
 
 func NewAdapter(config *AdapterConfig) Adapter {
@@ -51,6 +54,9 @@ func NewAdapter(config *AdapterConfig) Adapter {
 	//	return ollama_native.NewClient(config.EndPoint, config.ApiKey)
 	case XAI:
 		return xai.NewClient(config.EndPoint, config.ApiKey)
+
+	case Fal:
+		return fal.NewClient(config.EndPoint, config.ApiKey)
 	default:
 		return base.NewClient(config.EndPoint, config.ApiKey)
 	}

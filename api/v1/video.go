@@ -9,7 +9,9 @@ type (
 		ImageSize      string `json:"image_size" binding:"required"`
 		NegativePrompt string `json:"negative_prompt,omitempty"`
 		Image          string `json:"image" binding:"required"`
-		Seed           int    `json:"seed,omitempty"`
+		Seed           uint64 `json:"seed,omitempty"`
+		// exp
+		Style string `json:"style,omitempty"`
 	}
 	VideoResponse struct {
 		RequestId string `json:"requestId"`

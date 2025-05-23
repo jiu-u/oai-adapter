@@ -2,12 +2,15 @@ package task
 
 import (
 	"context"
+	"errors"
 	"log"
 	"sync"
 	"time"
 
 	"github.com/oklog/ulid/v2"
 )
+
+var NeedCancelTaskErr = errors.New("bad request")
 
 // Status 表示任务状态
 type Status string
@@ -150,23 +153,30 @@ func (tm *Manager) startPolling(ctx context.Context, taskID string, poller Polle
 
 		// 调用轮询器查询任务状态
 		completed, data, err := poller.PollTask(pollCtx, externalID)
-
 		// 更新最后查询时间
 		result.UpdatedAt = time.Now()
 
 		if err != nil {
+			if errors.Is(err, NeedCancelTaskErr) {
+				result.Status = StatusFailed
+				result.StopPolling = true
+				result.Data = data
+				tm.tasks.Store(taskID, result)
+				return
+			}
 			// 轮询出错，但不一定表示任务失败，可能只是临时网络问题
 			// 记录错误但继续轮询
 			log.Printf("Error polling task %s: %v", taskID, err)
-		} else if completed {
-			// 任务已完成，更新状态并停止轮询
+		}
+		result.Data = data
+		if completed {
 			result.CompletedAt = time.Now()
-			result.Data = data
 			result.Status = StatusCompleted
 			result.StopPolling = true
 			tm.tasks.Store(taskID, result)
 			return
 		}
+		tm.tasks.Store(taskID, result)
 
 		// 使用指数退避增加轮询间隔
 		interval = time.Duration(float64(interval) * 1.5)

@@ -16,6 +16,11 @@ type (
 		Size              string `json:"size,omitempty"`
 		Style             string `json:"style,omitempty"` //  one of vivid or natural
 		User              string `json:"user,omitempty"`
+		// siliconflow
+		NegativePrompt    string `json:"negative_prompt,omitempty"`
+		NumInferenceSteps int    `json:"num_inference_steps,omitempty"`
+		Seed              int    `json:"seed,omitempty"`
+		Image             string `json:"image,omitempty"`
 	}
 	ImageGenerateResponse struct {
 		Created int64          `json:"created"`

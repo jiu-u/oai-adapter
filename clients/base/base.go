@@ -19,9 +19,9 @@ import (
 type Client struct {
 	EndPoint string // 使用v1后缀 eg: https://api.openai.com/v1
 	APIKey   string
-	client   *http.Client
-	taskMgr  task.TaskManager
-	baseUrl  string
+	Client   *http.Client
+	TaskMgr  task.TaskManager
+	HomeUrl  string
 }
 
 func NewClient(EndPoint, apiKey string) *Client {
@@ -32,24 +32,28 @@ func NewClient(EndPoint, apiKey string) *Client {
 	return &Client{
 		EndPoint: EndPoint,
 		APIKey:   apiKey,
-		client:   common.GetDefaultClient(),
-		taskMgr:  common.GetDefaultTaskManager(),
-		baseUrl:  baseUrl,
+		Client:   common.GetDefaultClient(),
+		TaskMgr:  common.GetDefaultTaskManager(),
+		HomeUrl:  baseUrl,
 	}
 }
 
 func (c *Client) SetClient(client *http.Client) {
-	c.client = client
+	c.Client = client
 }
 
-func (c *Client) RelayRequest(ctx context.Context, method, targetPath string, body io.ReadCloser, header http.Header) (io.ReadCloser, http.Header, error) {
+func (c *Client) RelayRequest(ctx context.Context, method, targetPath string, body io.Reader, header http.Header) (io.ReadCloser, http.Header, error) {
+	c.SetHeader(header)
+	targetUrl := c.HomeUrl + targetPath
+	return Relay(ctx, method, targetUrl, body, header, c.Client)
+}
+
+func (c *Client) SetHeader(header http.Header) {
 	header.Del("Authorization")
 	header.Set("Authorization", "Bearer "+c.APIKey)
-	targetUrl := c.baseUrl + targetPath
-	return Relay(ctx, method, targetUrl, body, header, c.client)
 }
 
-func (c *Client) generateHeaderByContentType(contentType string) http.Header {
+func (c *Client) GenerateHeaderByContentType(contentType string) http.Header {
 	headers := http.Header{}
 	headers.Set("Content-Type", contentType)
 	headers.Set("Authorization", "Bearer "+c.APIKey)
@@ -75,9 +79,9 @@ func (c *Client) SamePostJob(ctx context.Context, targetUrl string, req any, con
 	if err != nil {
 		return nil, nil, fmt.Errorf("marshal error: %w", err)
 	}
-	body := io.NopCloser(bytes.NewBuffer(reqBytes))
-	header := c.generateHeaderByContentType(contentType)
-	return Relay(ctx, http.MethodPost, targetUrl, body, header, c.client)
+	body := bytes.NewBuffer(reqBytes)
+	header := c.GenerateHeaderByContentType(contentType)
+	return Relay(ctx, http.MethodPost, targetUrl, body, header, c.Client)
 }
 
 func (c *Client) CreateResponses(ctx context.Context, req *v1.ResponsesRequest) (io.ReadCloser, http.Header, error) {
@@ -99,7 +103,7 @@ func (c *Client) CreateCompletions(ctx context.Context, req *v1.CompletionsReque
 func (c *Client) Models(ctx context.Context) (*v1.ModelResponse, error) {
 	var err error
 	targetUrl := c.EndPoint + "/models"
-	data, _, err := Relay(ctx, http.MethodGet, targetUrl, nil, nil, c.client)
+	data, _, err := Relay(ctx, http.MethodGet, targetUrl, nil, nil, c.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +190,7 @@ func (c *Client) CreateTranslation(ctx context.Context, req *v1.TranslationReque
 	header.Set("Authorization", "Bearer "+c.APIKey)
 
 	// 返回请求
-	return Relay(ctx, http.MethodPost, targetUrl, io.NopCloser(&buf), header, c.client)
+	return Relay(ctx, http.MethodPost, targetUrl, &buf, header, c.Client)
 }
 
 func (c *Client) CreateTranscription(ctx context.Context, req *v1.TranscriptionRequest) (io.ReadCloser, http.Header, error) {
@@ -281,7 +285,7 @@ func (c *Client) CreateTranscription(ctx context.Context, req *v1.TranscriptionR
 	header.Set("Authorization", "Bearer "+c.APIKey)
 
 	// 返回请求
-	return Relay(ctx, http.MethodPost, targetUrl, io.NopCloser(&buf), header, c.client)
+	return Relay(ctx, http.MethodPost, targetUrl, &buf, header, c.Client)
 }
 
 func (c *Client) CreateImage(ctx context.Context, req *v1.ImageGenerateRequest) (io.ReadCloser, http.Header, error) {
@@ -395,7 +399,7 @@ func (c *Client) CreateImageEdit(ctx context.Context, req *v1.ImageEditRequest) 
 	header.Set("Authorization", "Bearer "+c.APIKey)
 
 	// 返回请求
-	return Relay(ctx, http.MethodPost, targetUrl, io.NopCloser(&buf), header, c.client)
+	return Relay(ctx, http.MethodPost, targetUrl, &buf, header, c.Client)
 }
 
 func (c *Client) CreateImageVariation(ctx context.Context, req *v1.ImageVariationRequest) (io.ReadCloser, http.Header, error) {
@@ -466,7 +470,7 @@ func (c *Client) CreateImageVariation(ctx context.Context, req *v1.ImageVariatio
 	header.Set("Authorization", "Bearer "+c.APIKey)
 
 	// 返回请求
-	return Relay(ctx, http.MethodPost, targetUrl, io.NopCloser(&buf), header, c.client)
+	return Relay(ctx, http.MethodPost, targetUrl, &buf, header, c.Client)
 }
 
 func (c *Client) CreateRerank(ctx context.Context, req *v1.RerankRequest) (io.ReadCloser, http.Header, error) {
@@ -492,7 +496,7 @@ func (c *Client) CreateVideoSubmit(ctx context.Context, req *v1.VideoRequest) (*
 	}
 	// task
 	poller := NewPoller(c.GetVideoStatus)
-	taskID := c.taskMgr.CreatePollingTask(ctx, resp.RequestId, poller, nil)
+	taskID := c.TaskMgr.CreatePollingTask(ctx, resp.RequestId, poller, nil)
 	resp.RequestId = taskID
 	return &resp, nil
 }
@@ -500,13 +504,13 @@ func (c *Client) CreateVideoSubmit(ctx context.Context, req *v1.VideoRequest) (*
 func (c *Client) GetVideoStatus(ctx context.Context, externalID string) (bool, any, error) {
 	var err error
 	targetUrl := c.EndPoint + "/videos/status"
-	header := c.generateHeaderByContentType("application/json")
+	header := c.GenerateHeaderByContentType("application/json")
 	req := v1.VideoStatusRequest{
 		RequestId: externalID,
 	}
 	bodyBytes, _ := sonic.Marshal(req)
-	body := io.NopCloser(bytes.NewReader(bodyBytes))
-	respBody, _, err := Relay(ctx, http.MethodPost, targetUrl, body, header, c.client)
+	body := bytes.NewReader(bodyBytes)
+	respBody, _, err := Relay(ctx, http.MethodPost, targetUrl, body, header, c.Client)
 	if err != nil {
 		return false, nil, fmt.Errorf("relay error: %w", err)
 	}

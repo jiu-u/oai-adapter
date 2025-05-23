@@ -12,10 +12,10 @@ type (
 		Usage             Usage    `json:"usage,omitempty"`
 	}
 	Choice struct {
-		Index        int     `json:"index"`
-		Message      Message `json:"message"`
-		FinishReason string  `json:"finish_reason"`
-		Logprobs     any     `json:"logprobs,omitempty"`
+		Index        int               `json:"index"`
+		Message      CompletionMessage `json:"message"`
+		FinishReason string            `json:"finish_reason"`
+		Logprobs     any               `json:"logprobs,omitempty"`
 	}
 	CompletionMessage struct {
 		Content      string        `json:"content,omitempty"`
@@ -41,7 +41,7 @@ type (
 		Model             string            `json:"model"`
 		Object            string            `json:"object"`
 		SystemFingerprint string            `json:"systemFingerprint,omitempty"`
-		Usage             Usage             `json:"usage,omitempty"`
+		Usage             *Usage            `json:"usage,omitempty"`
 	}
 
 	ChoiceWithDelta struct {

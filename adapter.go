@@ -14,7 +14,7 @@ type Adapter interface {
 	// Settings
 	SetClient(client *http.Client)
 	// Relay
-	RelayRequest(ctx context.Context, method, targetPath string, body io.ReadCloser, header http.Header) (io.ReadCloser, http.Header, error)
+	RelayRequest(ctx context.Context, method, targetPath string, body io.Reader, header http.Header) (io.ReadCloser, http.Header, error)
 	// Responses
 	CreateResponses(ctx context.Context, req *v1.ResponsesRequest) (io.ReadCloser, http.Header, error)
 	// ChatCompletions
