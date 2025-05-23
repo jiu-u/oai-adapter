@@ -314,8 +314,6 @@ func (c *Client) CreateRerank(ctx context.Context, req *v1.RerankRequest) (io.Re
 	return base.NoImplementMethod(ctx, req)
 }
 
-// todo
-
 func (c *Client) CreateImage(ctx context.Context, req *v1.ImageGenerateRequest) (io.ReadCloser, http.Header, error) {
 	imageReq := ImageCreateRequest{
 		Prompt:            req.Prompt,
@@ -587,8 +585,6 @@ func (c *Client) CreateTranslation(ctx context.Context, req *v1.TranslationReque
 func (c *Client) CreateTranscription(ctx context.Context, req *v1.TranscriptionRequest) (io.ReadCloser, http.Header, error) {
 	return base.NoImplementMethod(ctx, req)
 }
-
-// todo
 
 func (c *Client) CreateVideoSubmit(ctx context.Context, req *v1.VideoRequest) (*v1.VideoResponse, error) {
 	createRequest := TextToVideoRequest{
