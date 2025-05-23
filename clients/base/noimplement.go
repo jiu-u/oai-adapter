@@ -7,6 +7,6 @@ import (
 	"net/http"
 )
 
-func NoImplementMethod(ctx context.Context, null any) (io.ReadCloser, http.Header, error) {
+func NoImplementMethod(_ context.Context, _ any) (io.ReadCloser, http.Header, error) {
 	return nil, nil, common.NoImplementError
 }

@@ -290,7 +290,7 @@ func (c *Client) CreateCompletions(ctx context.Context, req *v1.CompletionsReque
 	return base.NoImplementMethod(ctx, req)
 }
 
-func (c *Client) Models(ctx context.Context) (*v1.ModelResponse, error) {
+func (c *Client) Models(_ context.Context) (*v1.ModelResponse, error) {
 	resp := v1.ModelResponse{
 		Object: "list",
 		Data:   make([]v1.Model, 0, len(Models)),
