@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/bytedance/sonic"
 	v1 "github.com/jiu-u/oai-adapter/api/v1"
@@ -322,6 +321,7 @@ func (c *Client) CreateImage(ctx context.Context, req *v1.ImageGenerateRequest) 
 		Seed:              req.Seed,
 		NumInferenceSteps: req.NumInferenceSteps,
 		NumImages:         req.N,
+		SafetyTolerance:   6,
 	}
 	if req.Size != "" {
 		imageSize := strings.Split(req.Size, "x")
@@ -459,42 +459,71 @@ func (c *Client) DoPollTask(ctx context.Context, queueResp *QueueResponse, opts 
 			interval = c.calculateNextInterval(interval, options)
 			continue
 		}
-
 		// 根据任务状态处理
 		switch queueStatus.Status {
 		case "COMPLETED":
-			header := http.Header{}
-			header.Add("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
-			header.Add("Content-Type", "application/json")
-			header.Add("Accept", "*/*")
+			var resErr error
+			for _ = range 5 {
+				header := http.Header{}
+				header.Add("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
+				header.Add("Content-Type", "application/json")
+				header.Add("Accept", "*/*")
+				c.SetHeader(header)
 
-			c.SetHeader(header)
-			// 任务完成，获取结果
-			outputResp, _, err := base.Relay(ctx, http.MethodGet, queueResp.ResponseUrl, nil,
-				header, c.Client.Client)
+				// 任务完成，获取结果
+				outputResp, _, err := base.Relay(ctx, http.MethodGet, queueResp.ResponseUrl, nil,
+					header, c.Client.Client)
 
-			if err != nil {
-				if errors.Is(err, common.InternalError) {
-
-					lastErr = fmt.Errorf("failed to fetch completed task result: %v", err)
-				} else {
-					lastErr = fmt.Errorf("failed to fetch completed task result: %v", err)
+				if err != nil {
+					resErr = fmt.Errorf("failed to fetch completed task result: %w", err)
+					time.Sleep(time.Second * 2)
+					continue
 				}
-				time.Sleep(interval)
-				interval = c.calculateNextInterval(interval, options)
-				continue
+
+				outputRespBytes, err := io.ReadAll(outputResp)
+
+				if err != nil {
+					resErr = fmt.Errorf("failed to read task result: %w", err)
+					time.Sleep(time.Second * 2)
+					continue
+				}
+				time.Sleep(time.Second * 1)
+
+				return outputRespBytes, resErr
 			}
-
-			outputRespBytes, err := io.ReadAll(outputResp)
-
-			if err != nil {
-				lastErr = fmt.Errorf("failed to read task result: %v", err)
-				time.Sleep(interval)
-				interval = c.calculateNextInterval(interval, options)
-				continue
-			}
-
-			return outputRespBytes, nil
+			return nil, fmt.Errorf("failed to fetch completed task result: %w", resErr)
+			//header := http.Header{}
+			//header.Add("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
+			//header.Add("Content-Type", "application/json")
+			//header.Add("Accept", "*/*")
+			//
+			//c.SetHeader(header)
+			//// 任务完成，获取结果
+			//outputResp, _, err := base.Relay(ctx, http.MethodGet, queueResp.ResponseUrl, nil,
+			//	header, c.Client.Client)
+			//
+			//if err != nil {
+			//	if errors.Is(err, common.InternalError) {
+			//
+			//		lastErr = fmt.Errorf("failed to fetch completed task result: %v", err)
+			//	} else {
+			//		lastErr = fmt.Errorf("failed to fetch completed task result: %v", err)
+			//	}
+			//	time.Sleep(interval)
+			//	interval = c.calculateNextInterval(interval, options)
+			//	continue
+			//}
+			//
+			//outputRespBytes, err := io.ReadAll(outputResp)
+			//
+			//if err != nil {
+			//	lastErr = fmt.Errorf("failed to read task result: %v", err)
+			//	time.Sleep(interval)
+			//	interval = c.calculateNextInterval(interval, options)
+			//	continue
+			//}
+			//
+			//return outputRespBytes, nil
 
 		case "FAILED":
 			// 任务失败
@@ -519,9 +548,9 @@ func (c *Client) DoPollTask(ctx context.Context, queueResp *QueueResponse, opts 
 
 	// 达到最大尝试次数
 	if lastErr != nil {
-		return nil, fmt.Errorf("polling exceeded maximum attempts: %w", lastErr)
+		return nil, fmt.Errorf("polling exceeded maximum attempts: %w,requestId:%s", lastErr, queueResp.RequestId)
 	}
-	return nil, fmt.Errorf("polling exceeded maximum attempts (%d) without completion", options.MaxAttempts)
+	return nil, fmt.Errorf("polling exceeded maximum attempts (%d) without completion,requestId:%s", options.MaxAttempts, queueResp.RequestId)
 }
 
 func (c *Client) CreateImageEdit(ctx context.Context, req *v1.ImageEditRequest) (io.ReadCloser, http.Header, error) {

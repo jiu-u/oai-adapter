@@ -29,12 +29,14 @@ type (
 
 type (
 	ImageCreateRequest struct {
-		Prompt            string     `json:"prompt" binding:"required"`
-		ImageSize         *ImageSize `json:"image_size,omitempty"`
-		NegativePrompt    string     `json:"negative_prompt,omitempty"`
-		Seed              int        `json:"seed,omitempty"`
-		NumInferenceSteps int        `json:"num_inference_steps,omitempty"`
-		NumImages         int        `json:"num_images,omitempty"`
+		Prompt              string     `json:"prompt" binding:"required"`
+		ImageSize           *ImageSize `json:"image_size,omitempty"`
+		NegativePrompt      string     `json:"negative_prompt,omitempty"`
+		Seed                int        `json:"seed,omitempty"`
+		NumInferenceSteps   int        `json:"num_inference_steps,omitempty"`
+		NumImages           int        `json:"num_images,omitempty"`
+		EnableSafetyChecker bool       `json:"enable_safety_checker"`
+		SafetyTolerance     float64    `json:"safety_tolerance"`
 	}
 	ImageSize struct {
 		Width  int `json:"width"`

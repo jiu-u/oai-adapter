@@ -45,17 +45,16 @@ func RelayHandler(cl oaiadapter.Adapter, action RelayAction) func(w http.Respons
 			//fmt.Println(string(data))
 			r.Body = io.NopCloser(bytes.NewBuffer(data))
 		}
-		fmt.Printf("函数执行耗时1: %s\n", time.Since(startTime))
+		fmt.Printf("函数执行| 读取请求 | 耗时: %s\n", time.Since(startTime))
 		requestBody, err := ParseRequest(r, action)
-		fmt.Printf("函数执行耗时2: %s\n", time.Since(startTime))
+		fmt.Printf("函数执行| 解析请求 | 耗时: %s\n", time.Since(startTime))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		respBody, respHeader, err := DoRelayRequest(r.Context(), cl, action, requestBody)
 
-		elapsed := time.Since(startTime)
-		fmt.Printf("函数执行耗时: %s\n", elapsed)
+		fmt.Printf("函数执行| 请求处理 | 耗时: %s\n", time.Since(startTime))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

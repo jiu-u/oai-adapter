@@ -15,7 +15,11 @@ func Relay(ctx context.Context, method, targetURL string, body io.Reader, header
 		return nil, nil, err
 	}
 	if resp.StatusCode >= 400 {
-		return resp.Body, nil, fmt.Errorf("status code error: %d | %w", resp.StatusCode, common.StatusCodeError)
+		detail, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, nil, fmt.Errorf("status code error: %d | %w", resp.StatusCode, common.StatusCodeError)
+		}
+		return nil, nil, fmt.Errorf("status code error: %d | %w | %s", resp.StatusCode, common.StatusCodeError, string(detail))
 	}
 	return resp.Body, resp.Header, nil
 }
