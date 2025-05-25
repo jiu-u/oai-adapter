@@ -37,6 +37,22 @@ func (c *Client) CreateCompletions(ctx context.Context, req *v1.CompletionsReque
 	return base.NoImplementMethod(ctx, req)
 }
 
+func (c *Client) Models(ctx context.Context) (*v1.ModelResponse, error) {
+	resp := v1.ModelResponse{
+		Object: "list",
+		Data:   make([]v1.Model, 0, len(Models)),
+	}
+	for _, model := range Models {
+		resp.Data = append(resp.Data, v1.Model{
+			ID:      model,
+			Object:  "model",
+			Created: 0,
+			OwnedBy: "volcengine",
+		})
+	}
+	return &resp, nil
+}
+
 func (c *Client) CreateRerank(ctx context.Context, req *v1.RerankRequest) (io.ReadCloser, http.Header, error) {
 	return base.NoImplementMethod(ctx, req)
 }
