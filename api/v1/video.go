@@ -20,9 +20,10 @@ type (
 		RequestId string `json:"requestId"`
 	}
 	VideoStatusResponse struct {
-		Status  string        `json:"status"` // Succeed, InQueue, InProgress, Failed
-		Reason  string        `json:"reason"`
-		Results []VideoResult `json:"results"`
+		Status       string        `json:"status"` // Succeed, InQueue, InProgress, Failed
+		RawRequestId string        `json:"rawRequestId"`
+		Reason       string        `json:"reason"`
+		Results      []VideoResult `json:"results"`
 	}
 	VideoResult struct {
 		Videos []VideoItem `json:"videos"`

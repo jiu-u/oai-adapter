@@ -13,7 +13,7 @@ type CompletionsRequest struct {
 	MaxTokens        int64          `json:"max_tokens,omitempty"`
 	N                any            `json:"n,omitempty"`
 	PresencePenalty  float64        `json:"presence_penalty,omitempty"`
-	Seed             any            `json:"seed,omitempty"`
+	Seed             int64          `json:"seed,omitempty"`
 	Stop             any            `json:"stop,omitempty"`
 	Stream           bool           `json:"stream,omitempty"`
 	StreamOptions    *StreamOptions `json:"stream_options,omitempty"`
@@ -37,7 +37,7 @@ type (
 		Created           int64               `json:"created"`
 		Model             string              `json:"model"`
 		Choices           []CompletionsChoice `json:"choices"`
-		Usage             Usage               `json:"usage,omitempty"`
+		Usage             *Usage              `json:"usage,omitempty"`
 		SystemFingerprint string              `json:"systemFingerprint,omitempty"`
 	}
 	CompletionsChoice struct {

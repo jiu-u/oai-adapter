@@ -9,7 +9,7 @@ type (
 		ServiceTier       string   `json:"service_tier,omitempty"`
 		SystemFingerprint string   `json:"systemFingerprint,omitempty"`
 		Choices           []Choice `json:"choices"`
-		Usage             Usage    `json:"usage,omitempty"`
+		Usage             *Usage   `json:"usage,omitempty"`
 	}
 	Choice struct {
 		Index        int               `json:"index"`

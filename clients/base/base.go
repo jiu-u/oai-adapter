@@ -503,6 +503,8 @@ func (c *Client) CreateVideoSubmit(ctx context.Context, req *v1.VideoRequest) (*
 
 func (c *Client) GetVideoStatus(ctx context.Context, externalID string) (bool, any, error) {
 	var err error
+	var resp v1.VideoStatusResponse
+	resp.RawRequestId = externalID
 	targetUrl := c.EndPoint + "/videos/status"
 	header := c.GenerateHeaderByContentType("application/json")
 	req := v1.VideoStatusRequest{
@@ -512,16 +514,21 @@ func (c *Client) GetVideoStatus(ctx context.Context, externalID string) (bool, a
 	body := bytes.NewReader(bodyBytes)
 	respBody, _, err := Relay(ctx, http.MethodPost, targetUrl, body, header, c.Client)
 	if err != nil {
-		return false, nil, fmt.Errorf("relay error: %w", err)
+		resp.Status = "Failed"
+		resp.Reason = "relay error"
+		return false, &resp, fmt.Errorf("relay error: %w", err)
 	}
 	respBodyBytes, err := io.ReadAll(respBody)
 	if err != nil {
-		return false, nil, fmt.Errorf("read all error: %w", err)
+		resp.Status = "Failed"
+		resp.Reason = "read Data error"
+		return false, &resp, fmt.Errorf("read all error: %w", err)
 	}
-	var resp v1.VideoStatusResponse
 	err = sonic.Unmarshal(respBodyBytes, &resp)
 	if err != nil {
-		return false, nil, fmt.Errorf("unmarshal error: %w", err)
+		resp.Status = "Failed"
+		resp.Reason = "unmarshal error"
+		return false, &resp, fmt.Errorf("unmarshal error: %w", err)
 	}
 	if resp.Status == "Succeed" || resp.Status == "Failed" {
 		return true, &resp, nil

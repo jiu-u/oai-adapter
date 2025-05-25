@@ -22,6 +22,10 @@ func NewClient(endPoint, apiKey string) *Client {
 	}
 }
 
+func (c *Client) CreateResponses(ctx context.Context, req *v1.ResponsesRequest) (io.ReadCloser, http.Header, error) {
+	return base.NoImplementMethod(ctx, req)
+}
+
 func (c *Client) CreateRerank(ctx context.Context, req *v1.RerankRequest) (io.ReadCloser, http.Header, error) {
 	return base.NoImplementMethod(ctx, req)
 }

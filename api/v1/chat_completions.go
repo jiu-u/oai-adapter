@@ -28,7 +28,7 @@ type (
 		PresencePenalty   float64         `json:"presence_penalty,omitempty" binding:"omitempty,min=-2,max=2,default=0"` // 存在惩罚
 		ReasoningEffect   string          `json:"reasoning_effect,omitempty" binding:"omitempty,oneof=low medium high"`
 		ResponseFormat    *ResponseFormat `json:"response_format,omitempty"`
-		Seed              int             `json:"seed,omitempty"`
+		Seed              int64           `json:"seed,omitempty"`
 		ServiceTier       string          `json:"service_tier,omitempty"`
 		Stop              any             `json:"stop,omitempty"` // 停止标志
 		Store             bool            `json:"store,omitempty"`
