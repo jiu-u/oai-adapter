@@ -9,6 +9,7 @@ import (
 	"github.com/jiu-u/oai-adapter/clients/ollama_oai"
 	"github.com/jiu-u/oai-adapter/clients/openai"
 	"github.com/jiu-u/oai-adapter/clients/siliconflow"
+	"github.com/jiu-u/oai-adapter/clients/volcengine"
 	"github.com/jiu-u/oai-adapter/clients/xai"
 )
 
@@ -34,6 +35,8 @@ const (
 	Ollama2OAI   AdapterType = "Ollama2OAI"
 	OllamaNative AdapterType = "OllamaNative"
 
+	VolcEngine AdapterType = "VolcEngine"
+
 	Fal AdapterType = "Fal"
 )
 
@@ -45,6 +48,8 @@ func NewAdapter(config *AdapterConfig) Adapter {
 		return deepseek.NewClient(config.EndPoint, config.ApiKey)
 	case SiliconFlow:
 		return siliconflow.NewClient(config.EndPoint, config.ApiKey)
+	case VolcEngine:
+		return volcengine.NewClient(config.EndPoint, config.ApiKey)
 	case Gemini, Gemini2OAI:
 		return gemini_oai.NewClient(config.EndPoint, config.ApiKey)
 	//case GeminiNative:

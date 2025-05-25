@@ -24,6 +24,8 @@ type (
 		RawRequestId string        `json:"rawRequestId"`
 		Reason       string        `json:"reason"`
 		Results      []VideoResult `json:"results"`
+		// 附加的错误信息
+		Error any `json:"error"`
 	}
 	VideoResult struct {
 		Videos []VideoItem `json:"videos"`

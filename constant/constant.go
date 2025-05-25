@@ -7,4 +7,5 @@ const (
 	XAIDefaultURL         = "https://api.x.ai"
 	GeminiDefaultURL      = "https://generativelanguage.googleapis.com"
 	FalDefaultURL         = "https://queue.fal.run"
+	VolcEngineDefaultURL  = "https://ark.cn-beijing.volces.com"
 )
