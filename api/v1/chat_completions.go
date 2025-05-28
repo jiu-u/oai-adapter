@@ -14,10 +14,10 @@ type (
 		// Deprecated: Use tool_choice instead.
 		FunctionCall any `json:"function_call,omitempty"` //string(auto,none) or object{"name":"fn_name"}
 		// Deprecated: Use tools instead.
-		Functions           Function `json:"functions,omitempty"`
-		LogitBias           any      `json:"logit_bias,omitempty"`
-		Logprobs            bool     `json:"logprobs,omitempty"`
-		MaxCompletionTokens int      `json:"max_completion_tokens,omitempty"` // 最大完成数
+		Functions           []Function `json:"functions,omitempty"`
+		LogitBias           any        `json:"logit_bias,omitempty"`
+		Logprobs            bool       `json:"logprobs,omitempty"`
+		MaxCompletionTokens int        `json:"max_completion_tokens,omitempty"` // 最大完成数
 		// Deprecated: Use max_completion_tokens instead.
 		MaxTokens         int             `json:"max_tokens,omitempty"`
 		MetaData          any             `json:"meta_data,omitempty"`
