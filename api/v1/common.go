@@ -36,7 +36,7 @@ type (
 		Index int `json:"index,omitempty"`
 	}
 	WebSearchOptions struct {
-		SearchContentSize string        `json:"search_content_size,omitempty" binding:"omitempty,oneof=low medium high,default=medium"`
+		SearchContentSize string        `json:"search_content_size,omitempty" binding:"omitempty,oneof=low medium high" default:"medium"`
 		UserLocation      *UserLocation `json:"user_location,omitempty"`
 	}
 	UserLocation struct {
@@ -60,7 +60,7 @@ type (
 		Name        string `json:"name" binding:"required"`
 		Description string `json:"description,omitempty"`
 		Schema      any    `json:"schema,omitempty"`
-		Strict      bool   `json:"strict,omitempty" binding:"omitempty,default=false"`
+		Strict      bool   `json:"strict,omitempty" binding:"omitempty" default:"false"`
 	}
 	StreamOptions struct {
 		IncludeUsage bool `json:"include_usage,omitempty"`

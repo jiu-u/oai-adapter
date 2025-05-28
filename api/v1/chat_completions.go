@@ -10,7 +10,7 @@ type (
 		Messages         []Message `json:"messages"`                 // 聊天消息
 		Model            string    `json:"model" binding:"required"` // 模型名称
 		Audio            any       `json:"audio,omitempty"`
-		FrequencyPenalty float64   `json:"frequency_penalty,omitempty" binding:"omitempty,min=-2,max=2,default=0"` // 频率惩罚
+		FrequencyPenalty float64   `json:"frequency_penalty,omitempty" binding:"omitempty,min=-2,max=2" default:"0"` // 频率惩罚
 		// Deprecated: Use tool_choice instead.
 		FunctionCall any `json:"function_call,omitempty"` //string(auto,none) or object{"name":"fn_name"}
 		// Deprecated: Use tools instead.
@@ -22,19 +22,19 @@ type (
 		MaxTokens         int             `json:"max_tokens,omitempty"`
 		MetaData          any             `json:"meta_data,omitempty"`
 		Modalities        []string        `json:"modalities,omitempty"`
-		N                 int             `json:"n,omitempty" binding:"omitempty,default=1"`
+		N                 int             `json:"n,omitempty" binding:"omitempty" default:"1"`
 		ParallelToolCalls bool            `json:"parallel_tool_calls,omitempty"`
 		Prediction        any             `json:"prediction,omitempty"`
-		PresencePenalty   float64         `json:"presence_penalty,omitempty" binding:"omitempty,min=-2,max=2,default=0"` // 存在惩罚
+		PresencePenalty   float64         `json:"presence_penalty,omitempty" binding:"omitempty,min=-2,max=2" default:"0"` // 存在惩罚
 		ReasoningEffect   string          `json:"reasoning_effect,omitempty" binding:"omitempty,oneof=low medium high"`
 		ResponseFormat    *ResponseFormat `json:"response_format,omitempty"`
 		Seed              int64           `json:"seed,omitempty"`
 		ServiceTier       string          `json:"service_tier,omitempty"`
 		Stop              any             `json:"stop,omitempty"` // 停止标志
 		Store             bool            `json:"store,omitempty"`
-		Stream            bool            `json:"stream" binding:"omitempty,default=false"` // 流式返回
+		Stream            bool            `json:"stream" binding:"omitempty" default:"false"` // 流式返回
 		StreamOptions     *StreamOptions  `json:"stream_options,omitempty"`
-		Temperature       float64         `json:"temperature,omitempty" binding:"omitempty,min=0,max=2,default=1"` // 温度
+		Temperature       float64         `json:"temperature,omitempty" binding:"omitempty,min=0,max=2" default:"1"` // 温度
 		ToolChoice        any             `json:"tool_choice,omitempty"`
 		Tools             []Tool          `json:"tools,omitempty"`
 		TopLogprobs       int             `json:"top_logprobs,omitempty" binding:"omitempty,min=0,max=20"`

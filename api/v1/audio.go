@@ -5,8 +5,8 @@ import "mime/multipart"
 type (
 	AudioSpeechRequest struct {
 		Input          string  `json:"input" binding:"required"`
-		Model          string  `json:"model" binding:"required default=tts-1"`
-		Voice          string  `json:"voice" binding:"required default=alloy"`
+		Model          string  `json:"model" binding:"required" default:"tts-1"`
+		Voice          string  `json:"voice" binding:"required" default:"alloy"`
 		ResponseFormat string  `json:"response_format,omitempty"` // map、opus、acc、flac、wav、pcm
 		Speed          float64 `json:"speed,omitempty"`
 		Instructions   string  `json:"instructions,omitempty"`

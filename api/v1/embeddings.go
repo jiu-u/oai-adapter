@@ -5,7 +5,7 @@ type (
 		Input          any    `json:"input"`
 		Model          string `json:"model"`
 		Dimensions     int    `json:"dimensions,omitempty"`
-		EncodingFormat string `json:"encoding_format,omitempty" binding:"omitempty,oneof=base64 float,default=float"`
+		EncodingFormat string `json:"encoding_format,omitempty" binding:"omitempty,oneof=base64 float" default:"float"`
 		User           string `json:"user,omitempty"`
 	}
 )
