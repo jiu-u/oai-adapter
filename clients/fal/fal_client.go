@@ -16,6 +16,7 @@ import (
 	"github.com/oklog/ulid/v2"
 	"io"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -61,25 +62,58 @@ func (c *Client) CreateResponses(ctx context.Context, req *v1.ResponsesRequest) 
 	return base.NoImplementMethod(ctx, req)
 }
 
+func firstNChars(s string, n int) string {
+	count := 0
+	for i := range s {
+		if count == n {
+			return s[:i]
+		}
+		count++
+	}
+	return s
+}
+
 func (c *Client) ConvertChatCompletions(req *v1.ChatCompletionRequest) (io.ReadCloser, error) {
 	var err error
-	var req2 LLMRequest
-	req2.Reasoning = true
-	req2.Model = req.Model
+	var llmReq LLMRequest
+	llmReq.Reasoning = true
+	llmReq.Model = req.Model
 
 	const maxChars = 4850
+
+	defaultSystemPrompt := "You are a versatile and general-purpose AI assistant designed to assist with a wide range of queries, tasks, and conversations. You are capable of understanding and responding to questions on various topics, including but not limited to science, technology, culture, history, language, and everyday life. You can provide explanations, summaries, suggestions, and insights based on the information available to you. Additionally, you can engage in discussions, offer advice, and help users solve problems in a clear, concise, and friendly manner. Your responses should be accurate, helpful, and appropriate for the context of the conversation."
 
 	var systemPromptText string
 	var promptText string
 
-	limitText := "请严格按照要求：你只能完成关于智能体补充或对user的回答，不可以扮演user，你的回答中不应该带有user。请严格按照要求！！！"
-	systemPromptText += fmt.Sprintf("%s\n\n", limitText)
+	// 存储并最后reverse
+	promptList := make([]string, 0)
 
 	for _, msg := range req.Messages {
-
 		var content string
-		if msg.IsStringContent() {
+		isSystemRole := msg.Role == "system" || msg.Role == "developer"
+
+		if msg.IsStringContent() && isSystemRole {
 			content = msg.StringContent()
+			systemPromptText += fmt.Sprintf("%s\n\n", content)
+			continue
+		} else if msg.IsStringContent() && !isSystemRole {
+			content = msg.StringContent()
+			promptList = append(promptList, fmt.Sprintf("%s:%s\n\n", msg.Role, content))
+			continue
+		} else if !msg.IsStringContent() && isSystemRole {
+			mediaContents, err := msg.ParseContent()
+			if err != nil {
+				return nil, fmt.Errorf("parse content error: %w", err)
+			}
+			for _, mediaContent := range mediaContents {
+				// 对于其他类型内容，我们暂时忽略图像、音频等非文本类型
+				if mediaContent.Type == v1.ContentTypeText {
+					content += mediaContent.Text
+				}
+			}
+			systemPromptText += fmt.Sprintf("%s\n\n", content)
+			continue
 		} else {
 			mediaContents, err := msg.ParseContent()
 			if err != nil {
@@ -91,33 +125,42 @@ func (c *Client) ConvertChatCompletions(req *v1.ChatCompletionRequest) (io.ReadC
 					content += mediaContent.Text
 				}
 			}
-		}
-		formattedMsg := fmt.Sprintf("%s:%s\n\n", msg.Role, content)
-
-		if utf8.RuneCountInString(formattedMsg)+utf8.RuneCountInString(systemPromptText) <= maxChars {
-			systemPromptText += formattedMsg
-			continue
-		}
-		if utf8.RuneCountInString(formattedMsg)+utf8.RuneCountInString(promptText) <= maxChars {
-			promptText += formattedMsg
+			promptList = append(promptList, fmt.Sprintf("%s:%s\n\n", msg.Role, content))
 			continue
 		}
 
 	}
 
-	req2.SystemPrompt = systemPromptText
-	req2.Prompt = promptText
+	if systemPromptText != "" {
+		systemPromptText = defaultSystemPrompt
+	}
+
+	if utf8.RuneCountInString(systemPromptText) >= maxChars {
+		systemPromptText = firstNChars(systemPromptText, maxChars)
+	}
+
+	slices.Reverse(promptList)
+
+	for _, text := range promptList {
+		if utf8.RuneCountInString(text)+utf8.RuneCountInString(promptText) <= maxChars {
+			promptText = fmt.Sprintf("%s\n\n%s", text, promptText)
+			continue
+		}
+	}
+
+	llmReq.SystemPrompt = systemPromptText
+	llmReq.Prompt = promptText
 
 	// 确保Prompt不为空
-	if req2.SystemPrompt == "" && req2.Prompt == "" {
+	if llmReq.SystemPrompt == "" && llmReq.Prompt == "" {
 		return nil, fmt.Errorf("prompt cannot be empty")
 	}
 
 	// 如果需要可以在这里删除末尾多余的换行符
-	req2.Prompt = strings.TrimSuffix(req2.Prompt, "\n")
-	req2.SystemPrompt = strings.TrimSuffix(req2.SystemPrompt, "\n")
+	llmReq.Prompt = strings.TrimSuffix(llmReq.Prompt, "\n")
+	llmReq.SystemPrompt = strings.TrimSuffix(llmReq.SystemPrompt, "\n")
 
-	bytesData, err := sonic.Marshal(req2)
+	bytesData, err := sonic.Marshal(llmReq)
 	if err != nil {
 		return nil, fmt.Errorf("marshal error: %w", err)
 	}
