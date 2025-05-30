@@ -92,6 +92,7 @@ func (c *Client) ConvertChatCompletions(req *v1.ChatCompletionRequest) (io.ReadC
 	for _, msg := range req.Messages {
 		var content string
 		isSystemRole := msg.Role == "system" || msg.Role == "developer"
+		fmt.Println(msg.Role)
 
 		if msg.IsStringContent() && isSystemRole {
 			content = msg.StringContent()
@@ -131,7 +132,7 @@ func (c *Client) ConvertChatCompletions(req *v1.ChatCompletionRequest) (io.ReadC
 
 	}
 
-	if systemPromptText != "" {
+	if systemPromptText == "" {
 		systemPromptText = defaultSystemPrompt
 	}
 
